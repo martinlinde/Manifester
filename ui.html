@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 12px;
+      background: #1e1e1e;
+      color: #e0e0e0;
+      padding: 16px;
+    }
+
+    h1 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #fff;
+    }
+
+    h2 {
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: #22c55e;
+    }
+
+    h3 {
+      font-size: 11px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: #a1a1aa;
+    }
+
+    .section {
+      background: #2a2a2a;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .description {
+      color: #888;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    button {
+      flex: 1;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    button.primary {
+      background: #22c55e;
+      color: #000;
+    }
+
+    button.primary:hover {
+      background: #16a34a;
+    }
+
+    button.secondary {
+      background: #3f3f46;
+      color: #fff;
+    }
+
+    button.secondary:hover {
+      background: #52525b;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    button:disabled:hover {
+      background: inherit;
+    }
+
+    button.secondary:disabled {
+      background: #3f3f46;
+    }
+
+    button.destructive {
+      background: #ef4444;
+      color: #fff;
+    }
+
+    button.destructive:hover {
+      background: #dc2626;
+    }
+
+    textarea {
+      width: 100%;
+      height: 120px;
+      background: #1a1a1a;
+      border: 1px solid #3f3f46;
+      border-radius: 6px;
+      padding: 12px;
+      font-family: 'SF Mono', monospace;
+      font-size: 11px;
+      color: #e0e0e0;
+      resize: vertical;
+      margin-bottom: 8px;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #22c55e;
+    }
+
+    textarea.small {
+      height: 80px;
+    }
+
+    .file-input-wrapper {
+      position: relative;
+      margin-bottom: 8px;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .file-label {
+      display: block;
+      padding: 12px;
+      background: #1a1a1a;
+      border: 2px dashed #3f3f46;
+      border-radius: 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .file-label:hover {
+      border-color: #22c55e;
+      background: #222;
+    }
+
+    .file-label.has-file {
+      border-color: #22c55e;
+      background: rgba(34, 197, 94, 0.1);
+    }
+
+    .file-label.small {
+      padding: 8px;
+      font-size: 11px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 16px;
+      background: #2a2a2a;
+      padding: 4px;
+      border-radius: 8px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 8px 12px;
+      border: none;
+      background: transparent;
+      color: #888;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .tab.active {
+      background: #3f3f46;
+      color: #fff;
+    }
+
+    .tab:hover:not(.active) {
+      color: #e0e0e0;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .status {
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin-top: 12px;
+      font-size: 11px;
+    }
+
+    .status.success {
+      background: rgba(34, 197, 94, 0.2);
+      color: #22c55e;
+    }
+
+    .status.error {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+    }
+
+    .status.warning {
+      background: rgba(251, 191, 36, 0.2);
+      color: #fbbf24;
+    }
+
+    .status.info {
+      background: rgba(59, 130, 246, 0.2);
+      color: #3b82f6;
+    }
+
+    .info-box {
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      border-radius: 6px;
+      padding: 12px;
+      margin-top: 12px;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .info-box code {
+      background: #1a1a1a;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'SF Mono', monospace;
+    }
+
+    .subsection {
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #3f3f46;
+    }
+
+    .subsection:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>HUD Design System Sync</h1>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="import">Import</button>
+    <button class="tab" data-tab="export">Export</button>
+    <button class="tab" data-tab="hud">Generate HUD</button>
+  </div>
+
+  <!-- IMPORT TAB -->
+  <div id="import" class="tab-content active">
+    <!-- Import Design Tokens (swatches) -->
+    <div class="section">
+      <h2>Import Design Tokens</h2>
+      <p class="description">
+        Load your design-tokens.json file to create visual swatches and guides in Figma.
+      </p>
+
+      <div class="file-input-wrapper">
+        <input type="file" id="import-file" accept=".json">
+        <label for="import-file" class="file-label" id="import-file-label">
+          Click to select design-tokens.json<br>
+          <small style="color: #666;">or drag and drop</small>
+        </label>
+      </div>
+
+      <textarea id="import-json" placeholder="Or paste your JSON here..."></textarea>
+
+      <div class="button-row">
+        <button class="primary" id="import-btn">Import Tokens</button>
+      </div>
+
+      <div class="info-box">
+        This will create a "HUD Design System" frame with:
+        <ul style="margin-top: 8px; margin-left: 16px;">
+          <li>Color swatches (editable fills)</li>
+          <li>Spacing scale visualization</li>
+          <li>Border radius samples</li>
+          <li>Typography size samples</li>
+          <li>Component height guides</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- EXPORT TAB -->
+  <div id="export" class="tab-content">
+    <div class="section">
+      <h2>Export Design Tokens</h2>
+      <p class="description">
+        Extract colors, spacing, and other values from the "Component Demo" frame back to JSON.
+      </p>
+
+      <div class="button-row">
+        <button class="primary" id="export-btn">Export from Figma</button>
+      </div>
+
+      <textarea id="export-json" placeholder="Exported JSON will appear here..." readonly></textarea>
+
+      <div class="button-row">
+        <button class="secondary" id="copy-btn">Copy to Clipboard</button>
+        <button class="secondary" id="download-btn">Download Tokens</button>
+        <button class="secondary" id="download-manifest-btn" style="display:none;">Download Manifest</button>
+      </div>
+
+      <div class="info-box">
+        <strong>After exporting:</strong>
+        <ol style="margin-top: 8px; margin-left: 16px;">
+          <li>Save <code>design-tokens.json</code> to <code>scripts/tools/exports/</code></li>
+          <li>Refresh app - tokens load automatically</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <!-- GENERATE HUD TAB -->
+  <div id="hud" class="tab-content">
+    <div class="section">
+      <h2>Generate Component Demo</h2>
+      <p class="description">
+        Generate the master Component Demo panel in Figma. Edit colors and styles, then export tokens back to code.
+      </p>
+
+      <!-- Design Tokens File -->
+      <div class="subsection">
+        <h3>1. Design Tokens (styling values)</h3>
+        <div class="file-input-wrapper">
+          <input type="file" id="tokens-file" accept=".json">
+          <label for="tokens-file" class="file-label small" id="tokens-file-label">
+            Select design-tokens.json
+          </label>
+        </div>
+        <textarea id="tokens-json" class="small" placeholder="Paste design-tokens.json contents here..."></textarea>
+      </div>
+
+      <!-- Node Manifest File (optional) -->
+      <div class="subsection">
+        <h3>2. Node Manifest (optional - structure from export)</h3>
+        <div class="file-input-wrapper">
+          <input type="file" id="manifest-file" accept=".json">
+          <label for="manifest-file" class="file-label small" id="manifest-file-label">
+            Select node-manifest.json (optional)
+          </label>
+        </div>
+        <textarea id="manifest-json" class="small" placeholder="Paste node-manifest.json contents here (optional)..."></textarea>
+      </div>
+
+      <div class="button-row">
+        <button class="primary" id="generate-hud-btn">Generate Component Demo</button>
+        <button class="secondary" id="regenerate-exact-btn" disabled>Regenerate Exact Structure</button>
+      </div>
+
+      <div class="info-box">
+        <strong>Two Generation Modes:</strong>
+        <ul style="margin-top: 8px; margin-left: 16px; list-style-type: disc;">
+          <li><strong>Component Demo:</strong> Creates a fresh panel from semantic structure (sections + controls)</li>
+          <li><strong>Regenerate Exact:</strong> Recreates the EXACT exported structure with all positions, sizes, and layouts (requires node-manifest.json)</li>
+        </ul>
+        <small style="color: #888; display: block; margin-top: 8px;">Tokens = HOW things look | Manifest = WHAT structure exists</small>
+      </div>
+    </div>
+  </div>
+
+  <div id="status-container"></div>
+
+  <script>
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.tab).classList.add('active');
+      });
+    });
+
+    // File input handling
+    function setupFileInput(inputId, labelId, textareaId) {
+      const fileInput = document.getElementById(inputId);
+      const fileLabel = document.getElementById(labelId);
+      const textarea = document.getElementById(textareaId);
+
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          fileLabel.classList.add('has-file');
+          fileLabel.innerHTML = `<strong>${file.name}</strong>`;
+
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            textarea.value = event.target.result;
+            // Trigger input event to update any listeners (e.g., regenerate button)
+            textarea.dispatchEvent(new Event('input'));
+          };
+          reader.readAsText(file);
+        }
+      });
+
+      // Drag and drop
+      fileLabel.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        fileLabel.style.borderColor = '#22c55e';
+      });
+
+      fileLabel.addEventListener('dragleave', () => {
+        if (!fileInput.files.length) {
+          fileLabel.style.borderColor = '#3f3f46';
+        }
+      });
+
+      fileLabel.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const file = e.dataTransfer.files[0];
+        if (file && file.name.endsWith('.json')) {
+          fileInput.files = e.dataTransfer.files;
+          fileInput.dispatchEvent(new Event('change'));
+        }
+      });
+    }
+
+    setupFileInput('import-file', 'import-file-label', 'import-json');
+    setupFileInput('tokens-file', 'tokens-file-label', 'tokens-json');
+    setupFileInput('manifest-file', 'manifest-file-label', 'manifest-json');
+
+    // Enable/disable "Regenerate Exact" button based on manifest content
+    function updateRegenerateButton() {
+      const manifestJson = document.getElementById('manifest-json').value.trim();
+      const regenerateBtn = document.getElementById('regenerate-exact-btn');
+      if (manifestJson) {
+        try {
+          const manifest = JSON.parse(manifestJson);
+          // Check if it's a valid node-manifest (has type MANIFEST_ROOT or FRAME)
+          if (manifest.type === 'MANIFEST_ROOT' || manifest.type === 'FRAME') {
+            regenerateBtn.disabled = false;
+            return;
+          }
+        } catch (e) {
+          // Invalid JSON
+        }
+      }
+      regenerateBtn.disabled = true;
+    }
+
+    // Listen for manifest textarea changes
+    document.getElementById('manifest-json').addEventListener('input', updateRegenerateButton);
+
+    // Store the loaded tokens for export
+    let loadedTokens = null;
+
+    // Show status message
+    function showStatus(message, type) {
+      const container = document.getElementById('status-container');
+      container.innerHTML = `<div class="status ${type}">${message}</div>`;
+      setTimeout(() => {
+        container.innerHTML = '';
+      }, 3000);
+    }
+
+    // Import button
+    document.getElementById('import-btn').addEventListener('click', () => {
+      const json = document.getElementById('import-json').value.trim();
+      if (!json) {
+        showStatus('Please provide JSON data', 'error');
+        return;
+      }
+      try {
+        JSON.parse(json); // Validate JSON
+        parent.postMessage({ pluginMessage: { type: 'import', data: json } }, '*');
+      } catch (e) {
+        showStatus('Invalid JSON: ' + e.message, 'error');
+      }
+    });
+
+    // Export button - sends tokens to update with extracted values
+    document.getElementById('export-btn').addEventListener('click', () => {
+      parent.postMessage({
+        pluginMessage: {
+          type: 'export',
+          manifest: loadedTokens  // Send the original tokens to update
+        }
+      }, '*');
+    });
+
+    // Copy button
+    document.getElementById('copy-btn').addEventListener('click', () => {
+      const textarea = document.getElementById('export-json');
+      if (textarea.value) {
+        navigator.clipboard.writeText(textarea.value);
+        showStatus('Copied to clipboard!', 'success');
+      }
+    });
+
+    // Download button - saves as design-tokens.json (fixed name for auto-loading)
+    document.getElementById('download-btn').addEventListener('click', () => {
+      const json = document.getElementById('export-json').value;
+      if (json) {
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'design-tokens.json';  // Fixed name - no index.json needed
+        a.click();
+        URL.revokeObjectURL(url);
+        showStatus('Downloaded! Save to scripts/tools/exports/', 'success');
+      }
+    });
+
+    // Default manifest structure (used if no manifest file provided)
+    const defaultManifest = {
+      panel: { title: "Component Demo" },
+      sections: {
+        componentDemo: [
+          {
+            name: "Toggle Controls",
+            collapsed: false,
+            controls: [
+              { type: "toggle", label: "Enable Feature", default: true },
+              { type: "toggle", label: "Dark Mode", default: false }
+            ]
+          },
+          {
+            name: "Slider Controls",
+            collapsed: false,
+            controls: [
+              { type: "slider", label: "Volume", min: 0, max: 100, suffix: "%", default: 50 },
+              { type: "slider", label: "Opacity", min: 0, max: 1, step: 0.01, default: 0.5 }
+            ]
+          },
+          {
+            name: "Select Controls",
+            collapsed: false,
+            controls: [
+              { type: "dropdown", label: "Style", options: [
+                { value: "option1", label: "Option One" },
+                { value: "option2", label: "Option Two" },
+                { value: "option3", label: "Option Three" }
+              ], default: "option2" }
+            ]
+          },
+          {
+            name: "Input Controls",
+            collapsed: false,
+            controls: [
+              { type: "input", label: "Text", default: "Hello World" },
+              { type: "input", label: "Number", default: "42" }
+            ]
+          },
+          {
+            name: "Color Controls",
+            collapsed: false,
+            controls: [
+              { type: "colorInput", label: "Accent" }
+            ]
+          },
+          {
+            name: "Button Controls",
+            collapsed: false,
+            controls: [
+              { type: "button", label: "Primary Action", variant: "primary", fullWidth: true },
+              { type: "button", label: "Secondary", variant: "default", fullWidth: true },
+              { type: "button", label: "Delete", variant: "destructive", fullWidth: true }
+            ]
+          }
+        ]
+      }
+    };
+
+    // =========================================================
+    // Node Manifest Parser - converts node-manifest to semantic format
+    // =========================================================
+    function parseNodeManifest(nodeManifest) {
+      if (!nodeManifest) return null;
+
+      // Get the first component (or root if legacy format)
+      let component;
+      if (nodeManifest.type === 'MANIFEST_ROOT' && nodeManifest.components) {
+        component = nodeManifest.components[0];
+      } else {
+        component = nodeManifest;
+      }
+
+      if (!component) return null;
+
+      // Extract panel title from first TEXT child
+      let panelTitle = component.name || 'Component Demo';
+      if (component.children) {
+        for (const child of component.children) {
+          if (child.type === 'TEXT' && child.characters) {
+            panelTitle = child.characters;
+            break;
+          }
+        }
+      }
+
+      const result = {
+        panel: { title: panelTitle },
+        sections: { componentDemo: [] }
+      };
+
+      // Find and parse all sections
+      if (component.children) {
+        for (const child of component.children) {
+          if (child.name && child.name.startsWith('Section:')) {
+            const section = parseSection(child);
+            if (section) {
+              result.sections.componentDemo.push(section);
+            }
+          }
+        }
+      }
+
+      return result;
+    }
+
+    function parseSection(sectionNode) {
+      const sectionName = sectionNode.name.replace('Section:', '').trim();
+      const section = {
+        name: sectionName,
+        collapsed: false,
+        controls: []
+      };
+
+      // Find Controls frame within section
+      if (sectionNode.children) {
+        for (const child of sectionNode.children) {
+          if (child.name === 'Controls' && child.children) {
+            for (const controlNode of child.children) {
+              const control = parseControl(controlNode);
+              if (control) {
+                section.controls.push(control);
+              }
+            }
+          }
+        }
+      }
+
+      return section;
+    }
+
+    function parseControl(controlNode) {
+      if (!controlNode || !controlNode.name) return null;
+
+      const colonIndex = controlNode.name.indexOf(':');
+      if (colonIndex === -1) return null;
+
+      const type = controlNode.name.substring(0, colonIndex).trim().toLowerCase();
+      const label = controlNode.name.substring(colonIndex + 1).trim();
+
+      const control = { type, label };
+
+      // Extract defaults based on type
+      switch (type) {
+        case 'toggle':
+          control.default = extractToggleState(controlNode);
+          break;
+        case 'slider':
+          extractSliderInfo(controlNode, control);
+          break;
+        case 'dropdown':
+          extractDropdownInfo(controlNode, control);
+          break;
+        case 'input':
+          control.default = extractInputValue(controlNode);
+          break;
+        case 'colorinput':
+          control.default = extractColorValue(controlNode);
+          break;
+        case 'button':
+          extractButtonInfo(controlNode, control);
+          break;
+      }
+
+      return control;
+    }
+
+    function findChildByName(node, name) {
+      if (!node || !node.children) return null;
+      for (const child of node.children) {
+        if (child.name === name) return child;
+      }
+      // Recursive search
+      for (const child of node.children) {
+        const found = findChildByName(child, name);
+        if (found) return found;
+      }
+      return null;
+    }
+
+    function findChildByType(node, type) {
+      if (!node || !node.children) return null;
+      for (const child of node.children) {
+        if (child.type === type) return child;
+      }
+      return null;
+    }
+
+    function extractToggleState(node) {
+      const toggleFrame = findChildByName(node, 'toggle');
+      if (toggleFrame) {
+        const track = findChildByName(toggleFrame, 'track');
+        if (track && track.fill) {
+          if (track.fill.includes('trackFilled') || track.fill.includes('accent')) {
+            return true;
+          }
+        }
+        const thumb = findChildByName(toggleFrame, 'thumb');
+        if (thumb && thumb.x > 10) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function extractSliderInfo(node, control) {
+      const sliderGroup = findChildByName(node, 'slider-group');
+      if (sliderGroup) {
+        const valueText = findChildByType(sliderGroup, 'TEXT');
+        if (valueText && valueText.characters) {
+          const text = valueText.characters;
+          if (text.includes('%')) {
+            control.suffix = '%';
+            control.min = 0;
+            control.max = 100;
+            control.default = parseInt(text, 10) || 50;
+          } else if (/^\d+\.?\d*$/.test(text)) {
+            const val = parseFloat(text);
+            if (val <= 1) {
+              control.min = 0;
+              control.max = 1;
+              control.step = 0.01;
+              control.default = val;
+            } else {
+              control.min = 0;
+              control.max = 100;
+              control.default = val;
+            }
+          }
+        }
+      }
+      if (control.default === undefined) {
+        control.min = 0;
+        control.max = 100;
+        control.default = 50;
+      }
+    }
+
+    function extractDropdownInfo(node, control) {
+      const dropdownFrame = findChildByName(node, 'dropdown');
+      if (dropdownFrame) {
+        const valueText = findChildByType(dropdownFrame, 'TEXT');
+        if (valueText && valueText.characters) {
+          control.default = valueText.characters;
+        }
+      }
+      control.options = [
+        { value: 'option1', label: 'Option One' },
+        { value: 'option2', label: 'Option Two' },
+        { value: 'option3', label: 'Option Three' }
+      ];
+      if (control.default) {
+        let found = false;
+        for (const opt of control.options) {
+          if (opt.label === control.default) {
+            control.default = opt.value;
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          control.options.unshift({ value: control.default, label: control.default });
+        }
+      } else {
+        control.default = 'option1';
+      }
+    }
+
+    function extractInputValue(node) {
+      const inputFrame = findChildByName(node, 'input');
+      if (inputFrame) {
+        const text = findChildByType(inputFrame, 'TEXT');
+        if (text && text.characters) {
+          return text.characters;
+        }
+      }
+      return '';
+    }
+
+    function extractColorValue(node) {
+      const swatch = findChildByName(node, 'color-swatch');
+      if (swatch && swatch.fill && swatch.fill.charAt(0) === '#') {
+        return swatch.fill;
+      }
+      return '#22C55E';
+    }
+
+    function extractButtonInfo(node, control) {
+      if (node.fill) {
+        if (node.fill.includes('destructive')) {
+          control.variant = 'destructive';
+        } else if (node.fill.includes('primary') || node.fill.includes('accent')) {
+          control.variant = 'primary';
+        } else {
+          control.variant = 'default';
+        }
+      } else {
+        control.variant = 'default';
+      }
+      control.fullWidth = true;
+    }
+
+    // Generate Component Demo button
+    document.getElementById('generate-hud-btn').addEventListener('click', () => {
+      const tokensJson = document.getElementById('tokens-json').value.trim();
+      const manifestJson = document.getElementById('manifest-json').value.trim();
+
+      if (!tokensJson) {
+        showStatus('Please provide design-tokens.json', 'error');
+        return;
+      }
+
+      try {
+        // Parse tokens
+        const tokens = JSON.parse(tokensJson);
+        loadedTokens = tokens; // Store for export
+
+        // Parse node-manifest and convert to semantic format, or use default
+        let manifest = defaultManifest;
+        let manifestSource = 'default';
+
+        if (manifestJson) {
+          const nodeManifest = JSON.parse(manifestJson);
+          // Check if this is a node-manifest (has type MANIFEST_ROOT or FRAME)
+          if (nodeManifest.type === 'MANIFEST_ROOT' || nodeManifest.type === 'FRAME') {
+            const parsed = parseNodeManifest(nodeManifest);
+            if (parsed && parsed.sections.componentDemo.length > 0) {
+              manifest = parsed;
+              manifestSource = 'node-manifest';
+              const sectionCount = parsed.sections.componentDemo.length;
+              const controlCount = parsed.sections.componentDemo.reduce((sum, s) => sum + s.controls.length, 0);
+              console.log('Parsed node-manifest:', sectionCount, 'sections,', controlCount, 'controls');
+              console.log('Parsed manifest:', JSON.stringify(manifest, null, 2));
+            } else {
+              console.warn('Could not parse node-manifest (no sections found), using default');
+              showStatus('Warning: Could not parse node-manifest structure, using default layout', 'warning');
+            }
+          } else if (nodeManifest.sections) {
+            // Already in semantic format
+            manifest = nodeManifest;
+            manifestSource = 'semantic';
+            console.log('Using semantic manifest directly');
+          } else {
+            console.warn('Unknown manifest format, using default');
+            showStatus('Warning: Unknown manifest format, using default layout', 'warning');
+          }
+        }
+
+        // Merge tokens into manifest structure for the plugin
+        const combined = {
+          ...manifest,
+          tokens: tokens,
+          // Add panel dimensions from tokens if available
+          panel: {
+            ...manifest.panel,
+            width: tokens.components?.panel?.width?.$value ? parseInt(tokens.components.panel.width.$value) : 320,
+            padding: tokens.components?.panel?.padding?.$value ? parseInt(tokens.components.panel.padding.$value) : 16,
+            cornerRadius: tokens.components?.panel?.cornerRadius?.$value ? parseInt(tokens.components.panel.cornerRadius.$value) : 12
+          }
+        };
+
+        console.log('Sending to Figma - manifest source:', manifestSource);
+        console.log('Sections:', combined.sections?.componentDemo?.length || 0);
+
+        parent.postMessage({
+          pluginMessage: {
+            type: 'generate-component-demo',
+            data: JSON.stringify(combined)
+          }
+        }, '*');
+
+        if (manifestSource === 'node-manifest') {
+          const sectionCount = combined.sections.componentDemo.length;
+          showStatus(`Generating from node-manifest: ${sectionCount} sections...`, 'info');
+        } else if (manifestSource === 'semantic') {
+          showStatus('Generating from semantic manifest...', 'info');
+        } else {
+          showStatus('Generating with default layout...', 'info');
+        }
+      } catch (e) {
+        showStatus('Invalid JSON: ' + e.message, 'error');
+      }
+    });
+
+    // REGENERATE EXACT: True round-trip regeneration from raw node-manifest
+    document.getElementById('regenerate-exact-btn').addEventListener('click', () => {
+      const tokensJson = document.getElementById('tokens-json').value.trim();
+      const manifestJson = document.getElementById('manifest-json').value.trim();
+
+      if (!tokensJson) {
+        showStatus('Please provide design-tokens.json', 'error');
+        return;
+      }
+      if (!manifestJson) {
+        showStatus('Please provide node-manifest.json for exact regeneration', 'error');
+        return;
+      }
+
+      try {
+        // Parse both files
+        const tokens = JSON.parse(tokensJson);
+        const manifest = JSON.parse(manifestJson);
+
+        // Validate manifest is a node-manifest
+        if (manifest.type !== 'MANIFEST_ROOT' && manifest.type !== 'FRAME') {
+          showStatus('Invalid node-manifest format. Must have type MANIFEST_ROOT or FRAME', 'error');
+          return;
+        }
+
+        // Get component count for status message
+        let componentCount = 1;
+        if (manifest.type === 'MANIFEST_ROOT' && manifest.components) {
+          componentCount = manifest.components.length;
+        }
+
+        // Send regeneration request to plugin
+        parent.postMessage({
+          pluginMessage: {
+            type: 'regenerate-from-manifest',
+            tokens: JSON.stringify(tokens),
+            manifest: JSON.stringify(manifest)
+          }
+        }, '*');
+
+        const plural = componentCount === 1 ? '' : 's';
+        showStatus(`Regenerating ${componentCount} component${plural} exactly as exported...`, 'info');
+      } catch (e) {
+        showStatus('Invalid JSON: ' + e.message, 'error');
+      }
+    });
+
+    // Store manifest data for separate download
+    let lastExportedManifest = null;
+
+    // Download helper
+    function downloadJson(content, filename) {
+      const blob = new Blob([content], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Handle messages from plugin
+    window.onmessage = (event) => {
+      const msg = event.data.pluginMessage;
+
+      // Legacy single-file export
+      if (msg && msg.type === 'export-result') {
+        document.getElementById('export-json').value = msg.data;
+        lastExportedManifest = null;
+        // Switch to export tab
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelector('[data-tab="export"]').classList.add('active');
+        document.getElementById('export').classList.add('active');
+        showStatus('Export complete!', 'success');
+      }
+
+      // DUAL EXPORT: tokens + manifest
+      if (msg && msg.type === 'export-dual-result') {
+        // Show tokens in textarea
+        document.getElementById('export-json').value = msg.tokens;
+        // Store manifest for separate download
+        lastExportedManifest = msg.manifest;
+
+        // Parse manifest to get component count
+        let componentCount = 1;
+        try {
+          const manifestObj = JSON.parse(msg.manifest);
+          componentCount = manifestObj.componentCount || 1;
+        } catch (e) {}
+
+        // Show manifest download button
+        document.getElementById('download-manifest-btn').style.display = 'block';
+
+        // Switch to export tab
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelector('[data-tab="export"]').classList.add('active');
+        document.getElementById('export').classList.add('active');
+
+        // Download tokens immediately
+        downloadJson(msg.tokens, 'design-tokens.json');
+
+        const plural = componentCount === 1 ? '' : 's';
+        showStatus('Exported ' + componentCount + ' component' + plural + '! Click "Download Manifest" for node-manifest.json', 'success');
+      }
+
+    };
+
+    // Manifest download button
+    document.getElementById('download-manifest-btn').addEventListener('click', () => {
+      if (lastExportedManifest) {
+        downloadJson(lastExportedManifest, 'node-manifest.json');
+        showStatus('node-manifest.json downloaded!', 'success');
+      }
+    });
+  </script>
+</body>
+</html>

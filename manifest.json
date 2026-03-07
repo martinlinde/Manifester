@@ -1,0 +1,29 @@
+{
+  "name": "Manifester",
+  "id": "manifester",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "editorType": ["figma"],
+  "documentAccess": "dynamic-page",
+  "networkAccess": {
+    "allowedDomains": ["none"]
+  },
+  "menu": [
+    {
+      "name": "Import Design Tokens",
+      "command": "import"
+    },
+    {
+      "name": "Export Design Tokens",
+      "command": "export"
+    },
+    {
+      "separator": true
+    },
+    {
+      "name": "Generate Component Mockups",
+      "command": "generate-components"
+    }
+  ]
+}
