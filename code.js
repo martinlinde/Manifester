@@ -1999,7 +1999,22 @@ async function exportDynamic(selectedFrames) {
               for (var vc = 0; vc < variantComp.children.length; vc++) {
                 variantChildren.push(await extractNode(variantComp.children[vc], depth + 1));
               }
-              variantData[variantComp.name] = { children: variantChildren };
+              var variantEntry = { children: variantChildren };
+              // Export the variant COMPONENT's own layout properties so consumers
+              // know the layout context (padding, alignment, spacing) per variant
+              if (variantComp.layoutMode && variantComp.layoutMode !== 'NONE') {
+                variantEntry.layoutMode = variantComp.layoutMode;
+                variantEntry.itemSpacing = variantComp.itemSpacing || 0;
+                variantEntry.paddingTop = variantComp.paddingTop || 0;
+                variantEntry.paddingBottom = variantComp.paddingBottom || 0;
+                variantEntry.paddingLeft = variantComp.paddingLeft || 0;
+                variantEntry.paddingRight = variantComp.paddingRight || 0;
+                if (variantComp.primaryAxisAlignItems) variantEntry.primaryAxisAlignItems = variantComp.primaryAxisAlignItems;
+                if (variantComp.counterAxisAlignItems) variantEntry.counterAxisAlignItems = variantComp.counterAxisAlignItems;
+                if (variantComp.primaryAxisSizingMode) variantEntry.primaryAxisSizingMode = variantComp.primaryAxisSizingMode;
+                if (variantComp.counterAxisSizingMode) variantEntry.counterAxisSizingMode = variantComp.counterAxisSizingMode;
+              }
+              variantData[variantComp.name] = variantEntry;
             }
           }
           if (Object.keys(variantData).length > 0) {
@@ -2040,73 +2055,84 @@ async function exportDynamic(selectedFrames) {
     }
 
     // Layout properties (for auto-layout frames) - use token refs where available
-    if (node.layoutMode && node.layoutMode !== 'NONE') {
-      nodeData.layoutMode = node.layoutMode;
+    // For INSTANCE nodes, layoutMode may not be directly readable even though the
+    // main component has auto-layout. Fall back to the main component's layout.
+    var layoutSource = node;
+    if ((!node.layoutMode || node.layoutMode === 'NONE') && node.type === 'INSTANCE') {
+      try {
+        var mc = await node.getMainComponentAsync();
+        if (mc && mc.layoutMode && mc.layoutMode !== 'NONE') {
+          layoutSource = mc;
+        }
+      } catch (e) { /* ignore */ }
+    }
+    if (layoutSource.layoutMode && layoutSource.layoutMode !== 'NONE') {
+      nodeData.layoutMode = layoutSource.layoutMode;
 
       // Item spacing - try token reference
       // IMPORTANT: For GRID layouts, we need to handle spacing carefully
       // itemSpacing = column gap (horizontal spacing between items)
       // counterAxisSpacing = row gap (vertical spacing between rows)
       // Note: itemSpacing can be 0, so we must check for undefined explicitly
-      var itemSpacingVal = node.itemSpacing !== undefined ? node.itemSpacing : 0;
+      var itemSpacingVal = layoutSource.itemSpacing !== undefined ? layoutSource.itemSpacing : 0;
       nodeData.itemSpacing = spacingToToken[itemSpacingVal] || itemSpacingVal;
       // Padding - try token references
-      var padTop = node.paddingTop || 0;
-      var padBottom = node.paddingBottom || 0;
-      var padLeft = node.paddingLeft || 0;
-      var padRight = node.paddingRight || 0;
+      var padTop = layoutSource.paddingTop || 0;
+      var padBottom = layoutSource.paddingBottom || 0;
+      var padLeft = layoutSource.paddingLeft || 0;
+      var padRight = layoutSource.paddingRight || 0;
       nodeData.paddingTop = spacingToToken[padTop] || padTop;
       nodeData.paddingBottom = spacingToToken[padBottom] || padBottom;
       nodeData.paddingLeft = spacingToToken[padLeft] || padLeft;
       nodeData.paddingRight = spacingToToken[padRight] || padRight;
       // Alignment properties for child positioning
-      if (node.primaryAxisAlignItems) {
-        nodeData.primaryAxisAlignItems = node.primaryAxisAlignItems; // MIN, CENTER, MAX, SPACE_BETWEEN
+      if (layoutSource.primaryAxisAlignItems) {
+        nodeData.primaryAxisAlignItems = layoutSource.primaryAxisAlignItems; // MIN, CENTER, MAX, SPACE_BETWEEN
       }
-      if (node.counterAxisAlignItems) {
-        nodeData.counterAxisAlignItems = node.counterAxisAlignItems; // MIN, CENTER, MAX
+      if (layoutSource.counterAxisAlignItems) {
+        nodeData.counterAxisAlignItems = layoutSource.counterAxisAlignItems; // MIN, CENTER, MAX
       }
       // Sizing mode (FIXED or HUG)
-      if (node.primaryAxisSizingMode) {
-        nodeData.primaryAxisSizingMode = node.primaryAxisSizingMode;
+      if (layoutSource.primaryAxisSizingMode) {
+        nodeData.primaryAxisSizingMode = layoutSource.primaryAxisSizingMode;
       }
-      if (node.counterAxisSizingMode) {
-        nodeData.counterAxisSizingMode = node.counterAxisSizingMode;
+      if (layoutSource.counterAxisSizingMode) {
+        nodeData.counterAxisSizingMode = layoutSource.counterAxisSizingMode;
       }
       // Grid/Wrap properties (for GRID layoutMode or wrapping auto-layout)
-      if (node.layoutWrap) {
-        nodeData.layoutWrap = node.layoutWrap; // NO_WRAP or WRAP
+      if (layoutSource.layoutWrap) {
+        nodeData.layoutWrap = layoutSource.layoutWrap; // NO_WRAP or WRAP
       }
       // Counter axis spacing (row gap for GRID or wrapped layouts)
       // For GRID layouts, ALWAYS export this value as it controls row gaps
       if (nodeData.layoutMode === 'GRID') {
         // GRID: always capture row gap (default to itemSpacing if not set for visual consistency)
-        var counterSpacingVal = node.counterAxisSpacing;
+        var counterSpacingVal = layoutSource.counterAxisSpacing;
         if (counterSpacingVal !== undefined) {
           nodeData.counterAxisSpacing = spacingToToken[counterSpacingVal] || counterSpacingVal;
         } else {
           // If counterAxisSpacing is undefined, use itemSpacing as fallback for row gap
           nodeData.counterAxisSpacing = nodeData.itemSpacing;
         }
-      } else if (node.counterAxisSpacing !== undefined && node.counterAxisSpacing !== 0) {
+      } else if (layoutSource.counterAxisSpacing !== undefined && layoutSource.counterAxisSpacing !== 0) {
         // Non-GRID: only capture if non-zero
-        var counterSpacingVal = node.counterAxisSpacing;
+        var counterSpacingVal = layoutSource.counterAxisSpacing;
         nodeData.counterAxisSpacing = spacingToToken[counterSpacingVal] || counterSpacingVal;
       }
       // Counter axis alignment for wrapped content
-      if (node.counterAxisAlignContent) {
-        nodeData.counterAxisAlignContent = node.counterAxisAlignContent; // AUTO, SPACE_BETWEEN
+      if (layoutSource.counterAxisAlignContent) {
+        nodeData.counterAxisAlignContent = layoutSource.counterAxisAlignContent; // AUTO, SPACE_BETWEEN
       }
 
       // GRID-specific: Also capture horizontalPadding/verticalPadding if they exist (older API)
       // These may be used instead of paddingLeft/Right and paddingTop/Bottom in some cases
       if (nodeData.layoutMode === 'GRID') {
-        if (node.horizontalPadding !== undefined && node.horizontalPadding !== 0) {
-          var hPadVal = node.horizontalPadding;
+        if (layoutSource.horizontalPadding !== undefined && layoutSource.horizontalPadding !== 0) {
+          var hPadVal = layoutSource.horizontalPadding;
           nodeData.horizontalPadding = spacingToToken[hPadVal] || hPadVal;
         }
-        if (node.verticalPadding !== undefined && node.verticalPadding !== 0) {
-          var vPadVal = node.verticalPadding;
+        if (layoutSource.verticalPadding !== undefined && layoutSource.verticalPadding !== 0) {
+          var vPadVal = layoutSource.verticalPadding;
           nodeData.verticalPadding = spacingToToken[vPadVal] || vPadVal;
         }
 
@@ -2115,14 +2141,14 @@ async function exportDynamic(selectedFrames) {
         // - gridColumnGap: column spacing (horizontal gap between items)
         // - gridRowGap: row spacing (vertical gap between rows)
         // Note: itemSpacing/counterAxisSpacing are legacy and may return incorrect values for GRID
-        if (node.gridColumnGap !== undefined) {
-          var gridColGapVal = node.gridColumnGap;
+        if (layoutSource.gridColumnGap !== undefined) {
+          var gridColGapVal = layoutSource.gridColumnGap;
           nodeData.gridColumnGap = spacingToToken[gridColGapVal] || gridColGapVal;
           // Override itemSpacing with the correct GRID value
           nodeData.itemSpacing = nodeData.gridColumnGap;
         }
-        if (node.gridRowGap !== undefined) {
-          var gridRowGapVal = node.gridRowGap;
+        if (layoutSource.gridRowGap !== undefined) {
+          var gridRowGapVal = layoutSource.gridRowGap;
           nodeData.gridRowGap = spacingToToken[gridRowGapVal] || gridRowGapVal;
           // Override counterAxisSpacing with the correct GRID value
           nodeData.counterAxisSpacing = nodeData.gridRowGap;
