@@ -1042,9 +1042,8 @@
 
     // Manifest download button
     document.getElementById('download-manifest-btn').addEventListener('click', async () => {
-      const data = lastExportedManifest || document.getElementById('export-json').value;
-      if (data) {
-        await downloadJson(data, 'node-manifest.json');
+      if (lastExportedManifest) {
+        await downloadJson(lastExportedManifest, 'node-manifest.json');
         showStatus('node-manifest.json downloaded!', 'success');
       } else {
         showStatus('No manifest data. Run Export first.', 'error');

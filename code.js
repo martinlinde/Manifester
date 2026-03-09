@@ -1817,11 +1817,60 @@ async function exportDynamic(selectedFrames) {
   // =========================================================================
   console.log("Step 3: Building complete node manifest (recursive)...");
 
-  // Helper to get fill color and try to map to token
+  // Helper to extract a single gradient stop from a Figma GradientStop
+  function extractGradientStop(stop) {
+    var color = stop.color;
+    var hex = rgbToHex(color.r, color.g, color.b);
+    var tokenRef = colorToToken[hex.toLowerCase()];
+    var result = {
+      color: tokenRef || hex,
+      position: stop.position
+    };
+    // Figma stores per-stop alpha in color.a (0-1)
+    if (color.a !== undefined && color.a < 1) {
+      result.opacity = color.a;
+    }
+    return result;
+  }
+
+  // Helper to get fill color/gradient and try to map to token
   function getFillRef(node) {
     if (!node.fills || node.fills.length === 0) return null;
     var fill = node.fills[0];
-    if (fill.type !== 'SOLID' || fill.visible === false) return null;
+    if (fill.visible === false) return null;
+
+    // Gradient fills (LINEAR or RADIAL)
+    if (fill.type === 'GRADIENT_LINEAR' || fill.type === 'GRADIENT_RADIAL') {
+      var gradientData = {
+        type: fill.type === 'GRADIENT_LINEAR' ? 'LINEAR' : 'RADIAL',
+        stops: []
+      };
+      // Extract gradient stops
+      if (fill.gradientStops) {
+        for (var gs = 0; gs < fill.gradientStops.length; gs++) {
+          gradientData.stops.push(extractGradientStop(fill.gradientStops[gs]));
+        }
+      }
+      // Figma gradientHandlePositions: array of {x,y} normalized 0-1
+      // [0] = start point, [1] = end point, [2] = width control (for radial)
+      if (fill.gradientHandlePositions) {
+        gradientData.handlePositions = [];
+        for (var gh = 0; gh < fill.gradientHandlePositions.length; gh++) {
+          gradientData.handlePositions.push({
+            x: fill.gradientHandlePositions[gh].x,
+            y: fill.gradientHandlePositions[gh].y
+          });
+        }
+      }
+      // Fill-level opacity
+      if (fill.opacity !== undefined && fill.opacity < 1) {
+        gradientData.opacity = fill.opacity;
+      }
+      return { gradient: gradientData };
+    }
+
+    // Solid fills
+    if (fill.type !== 'SOLID') return null;
     var hex = rgbToHex(fill.color.r, fill.color.g, fill.color.b);
     // Try to find token reference
     var tokenRef = colorToToken[hex.toLowerCase()];
@@ -1858,10 +1907,12 @@ async function exportDynamic(selectedFrames) {
     };
 
     // Fill - use token reference if available
-    // getFillRef returns either a string (color ref) or object { color, opacity }
+    // getFillRef returns: string (color ref), { color, opacity }, or { gradient: {...} }
     var fillRef = getFillRef(node);
     if (fillRef) {
-      if (typeof fillRef === 'object') {
+      if (typeof fillRef === 'object' && fillRef.gradient) {
+        nodeData.gradient = fillRef.gradient;
+      } else if (typeof fillRef === 'object') {
         nodeData.fill = fillRef.color;
         nodeData.fillOpacity = fillRef.opacity;
       } else {
