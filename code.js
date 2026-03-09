@@ -2189,6 +2189,18 @@ async function exportDynamic(selectedFrames) {
       for (var c = 0; c < node.children.length; c++) {
         nodeData.children.push(await extractNode(node.children[c], depth + 1));
       }
+
+      // Figma API may return auto-layout children in reverse visual order.
+      // Detect by checking if y-values are descending, and reverse if so.
+      var layout = nodeData.layoutMode;
+      if ((layout === 'VERTICAL' || layout === 'HORIZONTAL') && nodeData.children.length > 1) {
+        var posKey = (layout === 'VERTICAL') ? 'y' : 'x';
+        var first = nodeData.children[0][posKey];
+        var last = nodeData.children[nodeData.children.length - 1][posKey];
+        if (typeof first === 'number' && typeof last === 'number' && first > last) {
+          nodeData.children.reverse();
+        }
+      }
     }
 
     return nodeData;

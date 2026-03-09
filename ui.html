@@ -323,7 +323,7 @@
       <div class="button-row">
         <button class="secondary" id="copy-btn">Copy to Clipboard</button>
         <button class="secondary" id="download-btn">Download Tokens</button>
-        <button class="secondary" id="download-manifest-btn" style="display:none;">Download Manifest</button>
+        <button class="secondary" id="download-manifest-btn">Download Manifest</button>
       </div>
 
       <div class="info-box">
@@ -514,17 +514,11 @@
     });
 
     // Download button - saves as design-tokens.json (fixed name for auto-loading)
-    document.getElementById('download-btn').addEventListener('click', () => {
+    document.getElementById('download-btn').addEventListener('click', async () => {
       const json = document.getElementById('export-json').value;
       if (json) {
-        const blob = new Blob([json], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'design-tokens.json';  // Fixed name - no index.json needed
-        a.click();
-        URL.revokeObjectURL(url);
-        showStatus('Downloaded! Save to scripts/tools/exports/', 'success');
+        await downloadJson(json, 'design-tokens.json');
+        showStatus('Downloaded!', 'success');
       }
     });
 
@@ -963,9 +957,31 @@
     // Store manifest data for separate download
     let lastExportedManifest = null;
 
-    // Download helper
-    function downloadJson(content, filename) {
+    // Download helper — uses native file picker when available
+    async function downloadJson(content, filename) {
       const blob = new Blob([content], { type: 'application/json' });
+
+      // Try native file picker (File System Access API)
+      if (window.showSaveFilePicker) {
+        try {
+          const handle = await window.showSaveFilePicker({
+            suggestedName: filename,
+            types: [{
+              description: 'JSON file',
+              accept: { 'application/json': ['.json'] },
+            }],
+          });
+          const writable = await handle.createWritable();
+          await writable.write(blob);
+          await writable.close();
+          return;
+        } catch (e) {
+          // User cancelled the picker — don't fall through to auto-download
+          if (e.name === 'AbortError') return;
+        }
+      }
+
+      // Fallback: auto-download
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -1013,20 +1029,25 @@
         document.querySelector('[data-tab="export"]').classList.add('active');
         document.getElementById('export').classList.add('active');
 
-        // Download tokens immediately
-        downloadJson(msg.tokens, 'design-tokens.json');
-
-        const plural = componentCount === 1 ? '' : 's';
-        showStatus('Exported ' + componentCount + ' component' + plural + '! Click "Download Manifest" for node-manifest.json', 'success');
+        // Prompt save for both files sequentially
+        (async () => {
+          await downloadJson(msg.tokens, 'design-tokens.json');
+          await downloadJson(msg.manifest, 'node-manifest.json');
+          const plural = componentCount === 1 ? '' : 's';
+          showStatus('Exported ' + componentCount + ' component' + plural + '!', 'success');
+        })();
       }
 
     };
 
     // Manifest download button
-    document.getElementById('download-manifest-btn').addEventListener('click', () => {
-      if (lastExportedManifest) {
-        downloadJson(lastExportedManifest, 'node-manifest.json');
+    document.getElementById('download-manifest-btn').addEventListener('click', async () => {
+      const data = lastExportedManifest || document.getElementById('export-json').value;
+      if (data) {
+        await downloadJson(data, 'node-manifest.json');
         showStatus('node-manifest.json downloaded!', 'success');
+      } else {
+        showStatus('No manifest data. Run Export first.', 'error');
       }
     });
   </script>
